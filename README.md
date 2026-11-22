@@ -4,14 +4,76 @@ Sproutwall (formerly Family Hub) is a family dashboard for a screen in your kitc
 
 ## Install
 
-**Install it on the Raspberry Pi itself, not on your laptop.** You need a Raspberry Pi 4 or 5 running Raspberry Pi OS (64-bit), with its screen attached. A 64-bit computer with Debian or Ubuntu works too. Your laptop is only for writing the SD card and, if you like, for logging in to the Pi over SSH ([below](#with-one-command)).
+**Sproutwall runs on the Raspberry Pi itself, not on your laptop.** You need a Raspberry Pi 4 or 5 running Raspberry Pi OS (64-bit), with its screen attached. A 64-bit computer with Debian or Ubuntu works too. Your laptop writes the SD card and, if you like, logs in to the Pi over SSH, so the Pi needs no keyboard.
 
-- **New to Raspberry Pi?** Start with [the step-by-step guide](docs/INSTALL-BEGINNERS.md). It goes from a blank SD card to the hub on your kitchen screen.
-- **Using an AI assistant?** Open it in the Pi's own web browser and give it the prompt under [With an AI assistant](#with-an-ai-assistant).
+New to Raspberry Pi? Two step-by-step guides go from a blank SD card to the hub on your kitchen screen: [from your laptop over SSH](docs/INSTALL-OVER-SSH.md), with no keyboard on the Pi, or [with a keyboard on the Pi](docs/INSTALL-BEGINNERS.md).
+
+### Before you start: put the system on the card
+
+On your laptop, write the card with [Raspberry Pi Imager](https://www.raspberrypi.com/software/):
+
+1. **Device:** your Pi model. **OS:** Raspberry Pi OS (64-bit), the version with the desktop. **Storage:** the microSD card. Writing erases everything on it, so use a new card, or one whose contents are backed up somewhere else.
+2. **Customisation:**
+   - **Hostname:** `hub`, the Pi's name on your home network.
+   - **User:** a username and a password. Keep the password to yourself: you type it only into the Pi's own password prompts.
+   - **Localisation:** your time zone, keyboard layout and Wi-Fi country. The hub takes its time zone from the Pi.
+   - **Wi-Fi:** your home network, not a guest network. A network cable works too.
+   - **Remote access:** turn **SSH** on, with password authentication, if you will install from your laptop. Leave it off if you will type on the Pi with a keyboard.
+3. **Write.** Then put the card in the Pi, connect the screen and switch it on.
+
+If Imager says "Error reading from storage", see [If Imager can't read the card](docs/INSTALL-BEGINNERS.md#if-imager-cant-read-the-card).
+
+**To log in from your laptop (SSH):** once the Pi has started, open Terminal on a Mac or Linux laptop, or PowerShell on Windows, on the same home network. Type `ssh <user>@hub.local`, where `<user>` is the username you set in Imager (if you chose another hostname, use it in place of `hub`). The first time, ssh asks you to confirm the Pi's fingerprint: on your own home network, type `yes`. Then type the Pi's password. Everything you type in that window now runs on the Pi.
+
+### Choose how to install
+
+| Option | Who it's for | You need |
+|---|---|---|
+| [1. Have your AI do it](#1-have-your-ai-do-it) | You use an AI agent that can run commands, such as Claude Code or Codex CLI | That agent; on a laptop, SSH on in Imager |
+| [2. One command, by yourself](#2-one-command-by-yourself) | You're fine typing one command | SSH from your laptop, or a keyboard on the Pi |
+| [3. Free AI chat, no app](#3-free-ai-chat-no-app) | You've never done this, and have no paid AI and no app | A free chat AI in your web browser, and SSH from your laptop |
+
+All three run the same [one command](#with-one-command). It shows its plan and asks before it changes anything. Your passwords and the parent PIN never go to an AI.
+
+### 1. Have your AI do it
+
+Give an AI agent that can run commands, such as Claude Code or Codex CLI, the first of [the prompts](#the-prompts) below. On your laptop it works over SSH (tier B in the [install guide](INSTALL-WITH-AI.md)): with a temporary key from the guide's [step 1](INSTALL-WITH-AI.md#step-1-put-the-system-on-the-card), the agent can log in to the Pi itself; with only the Pi's password, you log in and run the commands it gives you. It can also run on the Pi itself, if you have a keyboard there (tier A; give it the second prompt, and the guide removes it at the end). It follows the guide: it asks the safety questions first, checks the Pi, and walks you through the one command. You run that command yourself and answer its questions. The agent never runs `sudo` and never sees your passwords or the parent PIN.
+
+### 2. One command, by yourself
+
+Log in to the Pi [over SSH](#before-you-start-put-the-system-on-the-card) from your laptop, or open **Terminal** on the Pi's own desktop with a keyboard. Then run the [one command](#with-one-command) as yourself, not with `sudo`. If you'd like each question explained as it comes, also give a chat AI one of [the prompts](#the-prompts).
+
+### 3. Free AI chat, no app
+
+No paid AI and no app needed. On your laptop, open a free chat AI in your web browser, such as ChatGPT, Claude or Gemini. Log in to the Pi [over SSH](#before-you-start-put-the-system-on-the-card) in a second window, and paste the first of [the prompts](#the-prompts) into the chat. The chat walks you through it: copy each command it gives you into your SSH window, and tell it only the short result it asks for. It can't see or change your Pi itself. If you are at the Pi with a keyboard instead, open the chat in the Pi's own web browser and use the second prompt.
+
+### The prompts
+
+Logged in to the Pi over SSH from your laptop:
+
+```text
+Help me install Sproutwall on my Raspberry Pi, set up for our family. I'm logged in to the Pi over SSH from my laptop, and I will run this one command myself in that SSH window:
+
+curl -fsSL https://raw.githubusercontent.com/thebrianlee/sproutwall/main/install.sh | bash
+
+The guide is https://github.com/thebrianlee/sproutwall/blob/main/INSTALL-WITH-AI.md, and I'm in its tier B. Explain each question the command asks me, and help me if it stops. Ask me whatever you need.
+```
+
+At the Pi's own Terminal, with a keyboard and screen:
+
+```text
+Help me install Sproutwall on my Raspberry Pi, set up for our family. I'm at the Pi's own Terminal and will run this one command myself:
+
+curl -fsSL https://raw.githubusercontent.com/thebrianlee/sproutwall/main/install.sh | bash
+
+The guide is https://github.com/thebrianlee/sproutwall/blob/main/INSTALL-WITH-AI.md. Explain each question the command asks me, and help me if it stops. Ask me whatever you need.
+```
+
+Each prompt names the one command itself, because a chat AI may not read the whole guide. To go step by step instead, tell the AI. [INSTALL-WITH-AI.md](INSTALL-WITH-AI.md) is the full guide, and you can also follow it by hand.
 
 ### With one command
 
-On the Pi, open **Terminal** on its desktop and run this as yourself, not with `sudo`:
+In your SSH window, or in **Terminal** on the Pi's own desktop, run this as yourself, not with `sudo`:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/thebrianlee/sproutwall/main/install.sh | bash
@@ -26,33 +88,19 @@ It runs the steps of the [install guide](INSTALL-WITH-AI.md) for you, the way th
 - It waits while you set up your household and the parent PIN on the device's own screen. It never asks for, reads or shows the PIN.
 - On Raspberry Pi OS it sets up the screen with `setup kiosk`, unless you chose no kiosk; Debian and Ubuntu skip this. At the end it tells you to restart and how to check the hub.
 
-**From your laptop instead, over SSH.** You don't need a keyboard on the Pi. In Raspberry Pi Imager, set the hostname to `hub` and turn SSH on with password authentication (the simplest choice). Once the Pi has started, open a terminal on a laptop on the same home network, log in with `ssh <user>@hub.local` (`<user>` is the username you set in Imager; if you chose another hostname, use it in place of `hub`; the first time, ssh asks you to confirm the Pi's fingerprint: on your own home network, type `yes`), and run the same command there. Over SSH, the command first asks you to accept that keeping SSH on is your own responsibility, and takes a read-only look at the SSH settings with `sudo`, before it changes anything. You set up the household in your laptop's browser. At the end it offers to turn SSH off, and turning it off is the safe choice. It refuses an SSH session that does not come from your home network, and it needs the Pi to have an IPv4 address on your home network (most do), because your laptop's browser reaches the hub over IPv4.
+**Over SSH,** the command first asks you to accept that keeping SSH on is your own responsibility, and takes a read-only look at the SSH settings with `sudo`, before it changes anything. You set up the household in your laptop's browser. At the end it offers to turn SSH off, and turning it off is the safe choice: SSH is off only when it then prints a line that starts with "SSH is off:". It refuses an SSH session that does not come from your home network, and it needs the Pi to have an IPv4 address on your home network (most do), because your laptop's browser reaches the hub over IPv4.
 
 What it doesn't do: put the system on the card, update or restore a hub that is already there, set up remote access, sign in to anything, or send anything anywhere except the package installs, the code and image downloads and the image's signature check. If a check fails, it stops with one line that says why and what to do; [If something goes wrong](INSTALL-WITH-AI.md#if-something-goes-wrong) has the details. The one-command install is new and has not been tried on a Raspberry Pi yet.
-
-### With an AI assistant
-
-Open your AI assistant in the Pi's own web browser, so that each command can be copied straight into the Pi's Terminal. Give it this prompt:
-
-```text
-Help me install Sproutwall on my Raspberry Pi, set up for our family. I'm at the Pi's own Terminal and will run this one command myself:
-
-curl -fsSL https://raw.githubusercontent.com/thebrianlee/sproutwall/main/install.sh | bash
-
-The guide is https://github.com/thebrianlee/sproutwall/blob/main/INSTALL-WITH-AI.md. Explain each question the command asks me, and help me if it stops. Ask me whatever you need.
-```
-
-The prompt names the one command itself, because a chat assistant may not read the whole guide. The assistant explains each of the command's questions as they come. [INSTALL-WITH-AI.md](INSTALL-WITH-AI.md) is the full guide: to go step by step instead, tell the assistant. You can also follow the guide by hand. It also covers putting the system on the card.
 
 ### For AI assistants helping someone install Sproutwall
 
 If you are an AI assistant helping someone install Sproutwall, follow these rules:
 
-- **Commands run on the Pi, never on the person's laptop.** The laptop only writes the SD card with Raspberry Pi Imager and, over SSH, holds the person's own SSH session to the Pi. If you are a chat assistant, have the person open you in the Pi's web browser, so they can copy each command into the Pi's own Terminal.
+- **Commands run on the Pi, never on the person's laptop.** The laptop only writes the SD card with Raspberry Pi Imager and, over SSH, holds the person's own SSH session to the Pi. If you are a chat assistant, the person copies each command into their SSH window on the laptop (tier B) or, with you open in the Pi's own web browser, into the Pi's Terminal (tier C).
 - **Ask the safety question first, before the card is written:** may the card or device hold a household that must not be erased? The card may be erased only if the owner confirms in their own words that it is new or blank, or confirms that the household is backed up off the device and that the card may be erased. An unsure answer means stop: don't write the card. Your own check can only find a hub; finding nothing never counts as a yes. A device that already runs Sproutwall or Family Hub is backed up and updated in place, never reinstalled ([First](INSTALL-WITH-AI.md#first-is-sproutwall-already-on-this-device)). Then ask at most the guide's [five decisions](INSTALL-WITH-AI.md#the-five-decisions). Don't ask for anything you can find out yourself, such as the Pi model, memory or screen.
-- **Default path, when the person is at the Pi's own Terminal (a chat assistant, or an AI tool running on the Pi): the one command above.** The person runs it themselves; you never run `sudo`. Explain its questions in the order it asks them: on Raspberry Pi OS only, how the screen hangs (Enter is portrait); the install plan (the person reads it and types `y`); possibly the Pi password right after that, for a read-only look for an existing hub; the home-network rule (`y` only if it is true); then the Pi password when the installs start. The password goes only into `sudo`'s own prompt. When it says "Set up your household now", wait and look at nothing until the person is done. Over SSH from a laptop (tier B in the guide), the person runs the same command in their own SSH session and types the `sudo` password there; you never run it. It then also asks the person to accept the SSH risk before any change: the person answers that themselves, and you must not answer it or urge them to. At the end it offers to turn SSH off.
+- **Default path in every tier: the one command above**, in the Pi's own Terminal or in the person's SSH session. The person runs it themselves; you never run `sudo`. Explain its questions in the order it asks them: on Raspberry Pi OS only, how the screen hangs (Enter is portrait); the install plan (the person reads it and types `y`); possibly the Pi password right after that, for a read-only look for an existing hub; the home-network rule (`y` only if it is true); then the Pi password when the installs start. The password goes only into `sudo`'s own prompt. When it says "Set up your household now", wait and look at nothing until the person is done. Over SSH from a laptop (tier B in the guide), the person runs the same command in their own SSH session and types the `sudo` password there; you never run it. It then also asks the person to accept the SSH risk before any change: the person answers that themselves, and you must not answer it or urge them to. At the end it offers to turn SSH off.
 - **Never ask for or accept** the parent PIN, any password (the Pi's or the Wi-Fi's), calendar links, tokens or API keys. The person types them only into the hub's own screen, `sudo`'s prompt or a service's own sign-in page.
-- **If the person declines** the plan or the home-network rule, the command ends with a plain message that nothing was changed. That is not an error to fix: end the session, or ask whether they want to continue. **If it stops,** it prints one line that starts with `Stopped:` and says why and what to do. Use that line with the guide's [If something goes wrong](INSTALL-WITH-AI.md#if-something-goes-wrong) and the doctor check, `cd ~/sproutwall && ./scripts/sproutwall doctor --json --phase running --tier C` once the hub has started. Ask for and share nothing else: no logs, config files or screenshots. Never work around a stop.
+- **If the person declines** the plan or the home-network rule, the command ends with a plain message that nothing was changed. That is not an error to fix: end the session, or ask whether they want to continue. **If it stops,** it prints one line that starts with `Stopped:` and says why and what to do. Use that line with the guide's [If something goes wrong](INSTALL-WITH-AI.md#if-something-goes-wrong) and the doctor check, `cd ~/sproutwall && ./scripts/sproutwall doctor --json --phase running --tier C` once the hub has started (`--tier B` over SSH). Ask for and share nothing else: no logs, config files or screenshots. Never work around a stop.
 - **Never suggest** Docker's convenience script, `docker compose down -v`, `docker volume rm`, deleting the `sproutwall` folder, the `:preview` tag, `gh auth login` or a GitHub token, skipping the image check, turning the screen lock off, or exposing the hub beyond the home network (port forwarding, tunnels, public servers).
 - **Don't use the build-from-source installs** ([manual install](docs/manual-install.md), and the build steps of the [Raspberry Pi guide](docs/raspberry-pi.md)) for a family. They are for developers: they build the image on the device instead of installing the verified one.
 - **Full rules:** [For the AI reading this](INSTALL-WITH-AI.md#for-the-ai-reading-this) in INSTALL-WITH-AI.md. They apply to every step.
