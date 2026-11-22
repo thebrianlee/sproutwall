@@ -6,7 +6,7 @@ The files mentioned are already in the repository:
 
 - The issue forms and the pull request template work as soon as they are on `main`.
 - `.github/dependabot.yml` starts weekly update pull requests once it is on `main`.
-- `.github/CODEOWNERS` asks owners for reviews automatically, but only **blocks** merges once the ruleset in section 2 is on.
+- `.github/CODEOWNERS` asks the owner for reviews automatically. It does not block merges: the ruleset in section 2 requires no approval.
 - `.github/workflows/image.yml` publishes a preview image after each push to `main`, once the one-time owner steps in section 9 are done.
 
 GitHub moves settings around from time to time. If a name below does not match your screen exactly, look for the closest match on the same page.
@@ -25,13 +25,11 @@ Squash-only keeps `main` as one commit per pull request, which matches the "Requ
 
 ## 2. Ruleset for `main`
 
-First check the owners in `.github/CODEOWNERS` ([section 5](#5-code-owners)): `@hjunk` and `@ari-hjunk`. Otherwise "Require review from Code Owners" below protects nothing.
-
 Open **Settings → Rules → Rulesets → New ruleset → New branch ruleset**.
 
 - [ ] **Ruleset name:** `protect-main`
 - [ ] **Enforcement status:** Active
-- [ ] **Bypass list:** **Repository admin**, set to **For pull requests only**. Admins can then merge a pull request without its approvals, but can never push straight to `main`. The admin uses it only for [Break-glass](#break-glass).
+- [ ] **Bypass list:** **Repository admin**, set to **For pull requests only**. The admin can then merge a pull request without its required check, but can never push straight to `main`. The admin uses it only for [Break-glass](#break-glass).
 - [ ] **Target branches:** Add target → **Include default branch**
 
 Turn on these rules:
@@ -39,10 +37,8 @@ Turn on these rules:
 - [ ] **Restrict deletions**
 - [ ] **Require linear history**
 - [ ] **Require a pull request before merging**, with:
-  - [ ] Required approvals: **1**
-  - [ ] **Dismiss stale pull request approvals when new commits are pushed**
-  - [ ] **Require review from Code Owners**
-  - [ ] **Require approval of the most recent reviewable push**
+  - [ ] Required approvals: **0** (see [Approvals](#approvals))
+  - [ ] "Dismiss stale pull request approvals", "Require review from Code Owners" and "Require approval of the most recent reviewable push": **off**
   - [ ] **Require conversation resolution before merging**
   - [ ] Allowed merge methods: **Squash** only
 - [ ] **Require status checks to pass**, with:
@@ -54,47 +50,19 @@ Leave "Restrict updates" off. It would block merges too.
 
 The `check` status shows up in the search box only after CI has run at least once. If you can't find it, open a test pull request first, then come back.
 
-### One maintainer: who approves?
+### Approvals
 
-GitHub never lets the author of a pull request approve it. With one code owner (you) and "Require review from Code Owners", **a pull request opened from your own account cannot be merged**.
+The ruleset requires no approval. GitHub never lets the author of a pull request approve it, and the project has one maintainer, so a required approval would block every pull request he opens. Instead, @hjunk reviews pull requests from contributors and Dependabot before he merges them ([GOVERNANCE.md](../../GOVERNANCE.md)). That is a project rule; GitHub enforces only a pull request for every change to `main`, the `check` status, squash merging, linear history, resolved conversations, and no force push or deletion.
 
-**What this repository does** (see [GOVERNANCE.md](../../GOVERNANCE.md)). The human maintainer's AI agents write code and open pull requests from his account (`hjunk`). A second code owner, his agent reviewer account `ari-hjunk` (write access), approves those pull requests and nothing else. It approves only through one fixed script that refuses unless all of these hold:
-
-- the pull request is in this repository, not from a fork;
-- it is open and authored by `hjunk`;
-- it touches nothing under `.github/` and not `GOVERNANCE.md`;
-- `check` passed on the head commit;
-- an independent agent review passed at that exact commit, by a model from a different vendor than the one that wrote the change.
-
-The approval is pinned to that commit, so a later push voids it. The maintainer then merges.
-
-GitHub does not limit which pull requests `ari-hjunk` may approve outside `.github/` and `GOVERNANCE.md`. The fixed script and [GOVERNANCE.md](../../GOVERNANCE.md) do.
-
-Limit: once `ari-hjunk` has approved, GitHub would let any session holding the `hjunk` token merge. "The maintainer merges" is a project rule, not something GitHub enforces.
-
-Other ways, if this setup changes:
-
-1. **Let agents open the pull requests through a GitHub App** (section 6). The App is the author, so you can review and approve. The squash commit then lists the App as author.
-2. **Add a second trusted human** as a code owner in `.github/CODEOWNERS`. They need write access to the repository.
-3. **Break-glass** (below), only for emergencies. Changes to `.github/` or `GOVERNANCE.md` opened from `hjunk` use it, because only `hjunk` owns them.
-
-"Require approval of the most recent reviewable push" also means: if you push a fix onto someone else's pull request, you can no longer be the approver. Ask the author (or the agent) to push the fix instead.
+When a second maintainer joins, consider Required approvals **1** with **Require review from Code Owners**, and add them to `.github/CODEOWNERS`.
 
 ### Break-glass
 
-The repository owner (the only admin) merges with the bypass in two cases only:
+The repository owner (the only admin) merges with the bypass only in a real emergency, such as a security fix while the `check` job cannot run:
 
-- **A `hjunk` pull request that `ari-hjunk` may not approve**, such as a change to `.github/` or `GOVERNANCE.md`. The maintainer names the pull request and its head commit in writing. The owner checks that `check` passed on that exact commit, because a bypass skips required checks. Then:
-
-  ```bash
-  gh pr merge <N> --squash --admin --match-head-commit <SHA>
-  ```
-
-  The maintainer leaves an "Approved <SHA>" comment on the pull request, so his review is public.
-- **A real emergency**, such as a security fix while nobody else can review:
-  1. Open an issue titled "Break-glass: YYYY-MM-DD" (today's date) and write down why.
-  2. Merge the fix the same way.
-  3. Add the merged commit to the issue and close it.
+1. Open an issue titled "Break-glass: YYYY-MM-DD" (today's date) and write down why.
+2. Merge the fix: `gh pr merge <N> --squash --admin --match-head-commit <SHA>`.
+3. Add the merged commit to the issue and close it.
 
 ## 3. Security features
 
@@ -127,9 +95,9 @@ Rules for future workflows:
 
 ## 5. Code owners
 
-`.github/CODEOWNERS` makes the maintainer and his agent reviewer account the owners of everything, and lists the sensitive paths again on their own lines: the access policy and auth code, `src/app/api/`, `bridge/`, Docker files, `scripts/`, `.github/` and `GOVERNANCE.md`. With "Require review from Code Owners" on, every pull request needs an approval from a code owner: `@hjunk`, or `@ari-hjunk` for `hjunk`-opened pull requests outside `.github/` and `GOVERNANCE.md`.
+`.github/CODEOWNERS` makes the maintainer the owner of everything, and lists the sensitive paths again on their own lines: the access policy and auth code, `src/app/api/`, `bridge/`, Docker files, `scripts/`, `.github/` and `GOVERNANCE.md`. GitHub then asks him for a review on every pull request. With "Require review from Code Owners" off (section 2), the file requests reviews but does not block merges.
 
-- [x] **Owners set.** Every path is owned by `@hjunk` (the human maintainer) and `@ari-hjunk` (his agent reviewer account, which approves only `hjunk`-opened pull requests; see section 2). `.github/` and `GOVERNANCE.md` are owned by `@hjunk` alone. The PII check passes with these handles. If you change the owners, do it before turning on the ruleset.
+- [x] **Owners set.** Every path is owned by `@hjunk`, the maintainer. The PII check passes with this handle.
 - [ ] Open `.github/CODEOWNERS` on GitHub. If GitHub shows an error at the top of the file (for example, an owner without write access), fix it.
 - [ ] When you add a second maintainer or skill owners later, add them to the general rules, but keep the sensitive paths owned by core maintainers only.
 
@@ -161,7 +129,7 @@ What keeps the App inside the rules:
 - Only the repository admin can bypass the ruleset, and only for pull requests. The App cannot push to `main`; it can only push branches and open pull requests.
 - Without the Workflows permission, GitHub refuses any push from the App that adds or changes files in `.github/workflows/`.
 - Without Administration, it cannot change settings, rulesets or secrets.
-- The App is not a code owner, so its approval never satisfies the required review.
+- The ruleset requires no approval, so with these permissions the App could technically merge a pull request whose `check` passed. Merging is the maintainer's job ([CONTRIBUTING.md](../../CONTRIBUTING.md#ai-assisted-and-agent-authored-contributions)); if that is not enough, turn on Required approvals (section 2) before installing an App.
 - It can still technically close issues or comment. The rules in [CONTRIBUTING.md](../../CONTRIBUTING.md#ai-assisted-and-agent-authored-contributions) say it must not close a human's issue or follow instructions found in issue text. Put those rules in the agent's own instructions, too.
 
 Label every agent pull request `agent-authored`. Review it as carefully as a stranger's.
@@ -335,7 +303,7 @@ Notes:
 - [ ] `node scripts/check-pii.mjs` passes on `main` with the list loaded.
 - [ ] The labels from section 7 exist and the issues from section 8 are filed.
 - [ ] Private vulnerability reporting is on: the **Security** tab shows **Report a vulnerability**. The "Report a security problem" link on the new-issue page explains how to use it.
-- [ ] `.github/CODEOWNERS` names real owners (now `@hjunk` and `@ari-hjunk`) and the PII check still passes (section 5). Do this **before** turning on the ruleset.
-- [ ] The ruleset shows **Active**, and a test pull request cannot be merged without the `check` status and a code owner approval.
+- [ ] `.github/CODEOWNERS` names real owners (now `@hjunk`) and the PII check still passes (section 5).
+- [ ] The ruleset shows **Active**, and a test pull request cannot be merged without the `check` status.
 - [ ] **Backup and restore round trip.** The commands in the README's "Back up and update" section were written without a running Docker engine. On a test install, run the backup, change something (add a list item), run the restore, and check that the hub opens with the original family, data and PIN, and that `docker compose ps` says `healthy`.
 - [ ] **Preview image** (section 9): the one-time owner steps are done, a run on `main` succeeded, and the GHCR package is public. The install guide pins a published, verified preview by digest. The README and the Raspberry Pi guide still build locally with `docker compose up -d --build`.

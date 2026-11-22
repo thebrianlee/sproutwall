@@ -101,12 +101,9 @@ You may use AI tools. The rules below keep a human responsible for every change 
 
 **Label it.** If an AI agent wrote most of a pull request, add the `agent-authored` label and say in the description which tool or model wrote it and which human checked it.
 
-**How reviews work here.** Sproutwall has one human maintainer who reviews code, [@hjunk](https://github.com/hjunk). He works with AI agents that write and review code. [GOVERNANCE.md](GOVERNANCE.md) has the details.
+**How reviews work here.** [@hjunk](https://github.com/hjunk) is the maintainer. He reviews pull requests from contributors and Dependabot and merges them. [GOVERNANCE.md](GOVERNANCE.md) has the details.
 
-- Pull requests from contributors and from Dependabot need @hjunk's own approval. Agents may comment on them but never approve them.
-- Pull requests written by @hjunk's agents are opened from his account, so GitHub won't let him approve them. For those only, [@ari-hjunk](https://github.com/ari-hjunk), his agent reviewer account, approves after an independent AI review has passed at that exact commit. That approval means "an agent review passed", not a human review. @hjunk reads the review and merges.
-- Changes to `.github/` (workflows, CODEOWNERS, rules) and to `GOVERNANCE.md` always get @hjunk's own review. @ari-hjunk never approves them.
-- The writer is never the reviewer. A model that reviews comes from a different vendor than the one that wrote the code.
+- Changes to `.github/` (workflows, CODEOWNERS, rules) and to `GOVERNANCE.md` always get @hjunk's own review.
 
 **Agents and bots may:**
 
@@ -117,7 +114,7 @@ You may use AI tools. The rules below keep a human responsible for every change 
 
 **Agents and bots may not:**
 
-- approve pull requests (the one exception is @ari-hjunk, as described above) or push to `main`;
+- approve pull requests or push to `main`;
 - merge pull requests, except when the maintainer or the repository owner names the pull request and its head commit in writing; the merge then runs under that person's account;
 - edit `.github/workflows/`, `CODEOWNERS`, repository rulesets or secrets, unless the maintainer asked for that exact change; such changes always get @hjunk's own review;
 - close an issue opened by a human without a human's OK;
