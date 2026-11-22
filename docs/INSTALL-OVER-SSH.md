@@ -62,7 +62,7 @@ In the SSH window, paste this and press Enter. Run it as yourself, never with `s
 curl -fsSL https://raw.githubusercontent.com/thebrianlee/sproutwall/main/install.sh | bash
 ```
 
-It asks these questions, in this order. For the yes/no questions only `y` (or `yes`) goes on; anything else, or just Enter, ends with nothing changed.
+It asks these questions, in this order. For the yes/no questions in this table only `y` (or `yes`) goes on; anything else, or just Enter, ends with nothing changed.
 
 | Question on screen | What it means | Your answer |
 | --- | --- | --- |
@@ -72,18 +72,34 @@ It asks these questions, in this order. For the yes/no questions only `y` (or `y
 | SSH: YOUR RESPONSIBILITY. Do you understand and accept this? | While SSH is on, anyone on your home network who knows the Pi's password could log in. Keeping it safe is on you. | `y` to go on |
 | The `sudo` password prompt, if it asks | Your Pi password, for a read-only look at the SSH settings, then for the installs. On some Pis `sudo` doesn't ask. | the Pi password |
 
-Then it installs the tools, downloads the hub, checks the hub's signature and starts it. This is the long part. Let it run, and keep the SSH window open. Keep the laptop awake and plugged in until the command finishes: if the laptop sleeps, the SSH session and the install stop. If that happens, log in again and run the one command again; if it prints a `Stopped:` line, follow it.
+Then it installs the tools, downloads the hub, checks the hub's signature and starts it. This is the long part. Let it run, and keep the SSH window open. Keep the laptop awake and plugged in until the command finishes: if the laptop sleeps, the SSH session closes and the install stops partway.
+
+If the SSH window closed before the end, log in again (step 2) and type `ls ~/sproutwall`:
+
+- **It prints `No such file or directory`:** the install had not got the hub yet. Run the one command again. If it stops with a `Stopped:` line, follow it. If the lines above that say to run `sudo dpkg --configure -a`, run it, then run the one command again.
+- **Anything else** (a list of files, or nothing at all): the install had already started getting the hub. Don't run the one command again: it stops at once when it finds a hub on the device, because it never installs a second one. Don't delete the folder either. Start over instead: write the card again (step 1), then log in and run the one command (steps 2 and 3). Writing the card erases what this install put on it, including a household you may have set up in step 4. On a new card that is all there is, and you set the household up again in a few minutes. When you log in again, ssh warns that the Pi's identification has changed: see step 2. If you would rather not start over, tell us with an [install report](https://github.com/thebrianlee/sproutwall/issues/new?template=install_report.yml).
 
 ## Step 4: Set up the household, the screen, and finish
 
+From here on, the hub is installed and running. Answer only what the last line in the SSH window asks:
+
+- A line that ends with `(press Enter)` waits for Enter.
+- A question that ends with `[y/N]` needs `y` to say yes. Enter alone there means no.
+
 1. **"Set up your household now."** The command waits and prints an address such as `http://192.168.1.50:3847`. Open it in your laptop's web browser. On **Set up the house**, choose the sample family or your own, choose what the wall shows, then the house details and the **parent PIN** (typed twice). Tap **Open the wall**. Go back to the SSH window and press Enter.
-2. **The screen.** The picture turns the way you chose. Tap the four corners and the centre of the Pi's screen: each tap must land under your finger. Then press Enter in the SSH window. If you chose 5 (no kiosk), this step is skipped.
-3. **"Run it now? sudo asks for your password."** It asks only if the Pi's desktop doesn't log in by itself yet. That makes the screen come back after a power cut. Answer `y`, and type the Pi password if `sudo` asks.
+2. **The screen.** If you chose 5 (no kiosk), this step is skipped. Otherwise the screen setup prints what it did. Then one of these happens:
+    - **The last line asks you to tap and ends with `(press Enter)`.** Tap the four corners and the centre of the Pi's screen: each tap must land under your finger. Then press Enter. If the picture has not turned yet, it turns after the restart: check the taps then.
+    - **There is no `(press Enter)` line,** and the setup says the new settings apply at the next login. The picture turns only after the restart. Don't press Enter, even though the setup's own text says to tap the corners: answer the next question (3), if it comes. You check the screen after the restart.
+    - **"Try the screen setup again?"** It did not find the screen or its touch connection, or found more than one. Reconnect the screen and its touch cable, unplug any other screen, wait ten seconds, then type `y`. `n` leaves the Pi without the kiosk.
+    - **"The screen is not set up."** The hub still works from phones and tablets. The message says how to set up the screen later.
+3. **"Run it now? sudo asks for your password."** It asks only if the Pi's desktop doesn't log in by itself yet. Without that, the hub doesn't come back on the screen by itself after the restart or after a power cut. Type `y` (Enter alone means no), then the Pi password if `sudo` asks. If you answered no by mistake, type `sudo raspi-config nonint do_boot_behaviour B4` in the SSH window before the restart (6).
 4. **"Sproutwall is installed."** It prints a summary and a phone check: on a phone on the same Wi-Fi, open the address it shows. The phone must show **Unlock this screen** and ask for the PIN. It must never show the family without asking.
-5. **"Turn SSH off now?"** `y` is the safe choice. `n` keeps SSH on, and keeping the Pi safe is then on you.
+5. **"Turn SSH off now?"** `y` is the safe choice. `n` keeps SSH on, and keeping the Pi safe is then on you. Either way, this SSH window stays open until the restart.
 6. **Restart:** type `sudo reboot`. The SSH window closes.
 
 After the restart, the hub comes back on the Pi's screen by itself, the right way up, and asks once for the parent PIN: type it on the screen. Tap the four corners and the centre again. With no kiosk (choice 5), the screen shows the normal desktop; use the hub from phones and tablets. Either way, a phone on the Wi-Fi must still show **Unlock this screen**. The install is done.
+
+If you didn't choose 5 and, a few minutes after the restart, the screen shows a login screen or the normal desktop instead of the hub, the hub can't open by itself yet: usually the desktop doesn't log in by itself, or the screen setup didn't finish. SSH is off now, so plug a USB keyboard and mouse into the Pi. Log in on its screen if it asks, open **Terminal** and run `sudo raspi-config nonint do_boot_behaviour B4`, then `sudo reboot`. If the hub still doesn't come back, or taps land in the wrong place, run `cd ~/sproutwall && ./scripts/sproutwall setup kiosk --check` in that Terminal and follow [step 7 of the AI install guide](../INSTALL-WITH-AI.md#step-7-set-up-the-screen).
 
 The [AI install guide](../INSTALL-WITH-AI.md#step-8-remove-the-assistant-and-check-once-more) has the final check, for when you have a keyboard on the Pi or kept SSH on.
 
@@ -92,7 +108,8 @@ The [AI install guide](../INSTALL-WITH-AI.md#step-8-remove-the-assistant-and-che
 If something is wrong, the command prints one line that starts with `Stopped:`. That line says why and what to do. It never deletes your files or the hub's data.
 
 - Do what the line says. Don't work around it, and don't delete the `sproutwall` folder or anything Docker made.
-- If you answered `n` to a question, it ends with a plain message that nothing was changed. That is not an error: run the command again when you're ready.
+- If you answered `n`, or just Enter, to one of the yes/no questions in step 3, it ends with a plain message that nothing was changed. That is not an error: run the command again when you're ready.
+- The questions in step 4 don't end the install: by then the hub is installed and running. `n` there only skips that one thing (another screen setup try, autologin or turning SSH off), and the message says how to do it later. Don't run the one command again after that: it stops at once, because the hub is already there.
 
 Please tell us how it went, whether it worked or not, with an [install report](https://github.com/thebrianlee/sproutwall/issues/new?template=install_report.yml). Copy the `Stopped:` line exactly if there was one. Share nothing else: no passwords, no PIN, no logs or screenshots of your network.
 
