@@ -221,8 +221,9 @@ ipv4_on_home_network() {
 # Over SSH, for the phone check: the first home-network IPv4 address that is
 # not link-local (169.254.x.x reaches only a directly cabled laptop) and not on
 # a container or bridge interface such as docker0 (no phone reaches those).
+# An optional argument is an address to skip (the laptop's cable address).
 phone_ipv4() {
-  local listing line dev address
+  local skip=${1:-} listing line dev address
   listing=$(ip -o -4 addr show 2>/dev/null) || return 1
   while IFS= read -r line; do
     read -r _ dev _ address _ <<<"$line"
@@ -234,6 +235,7 @@ phone_ipv4() {
     case "$address" in
       169.254.*) continue ;;
     esac
+    [ -n "$skip" ] && [ "$address" = "$skip" ] && continue
     if ipv4_on_home_network "$address"; then
       printf '%s\n' "$address"
       return 0
@@ -1258,7 +1260,7 @@ stop_doctor() {
     stop "doctor found something that is not a clean result (see its report above). Its ssh_policy line is the password-SSH result expected over SSH during the install, not what stopped it. Look up each OTHER check and action in $GUIDE#if-something-goes-wrong"
   fi
   if [ "$OVER_SSH" = 1 ] && findings_include "$SSH_ON_FOR_INSTALL"; then
-    stop "doctor found SSH in a state this install can't accept, even over SSH: it listens on a public address, or it allows root login or empty passwords (ssh_policy). Fix that, or run the command in the device's own Terminal with SSH off: $GUIDE#if-something-goes-wrong"
+    stop "doctor found SSH in a state this install can't accept, even over SSH: it listens on a public address, or it allows root login or empty passwords (ssh_policy). Fix that SSH setting, then follow $GUIDE#if-something-goes-wrong (the hub is already installed: don't run the one command again)."
   fi
   stop "doctor found something that is not a clean result (see its report above). Don't work around it: look up each check and action in $GUIDE#if-something-goes-wrong"
 }
@@ -1439,6 +1441,7 @@ setup_screen() {
   if [ "$code" = 1 ]; then
     KIOSK_RESULT="attention"
     say "The screen settings apply at the next login: after the restart, run ./scripts/sproutwall setup kiosk --check (guide step 7)."
+    kiosk_check_no_keyboard_hint
     return 0
   fi
   say ""
@@ -1449,7 +1452,15 @@ setup_screen() {
   else
     KIOSK_RESULT="attention"
     say "The screen check needs attention (see above). The hub keeps working. Guide step 7: $GUIDE#step-7-set-up-the-screen"
+    kiosk_check_no_keyboard_hint
   fi
+}
+
+# Over SSH: the kiosk check needs a Terminal on the device after the restart.
+kiosk_check_no_keyboard_hint() {
+  [ "$OVER_SSH" = 1 ] || return 0
+  say "With no keyboard and SSH off you can't run that check: then the screen check after the restart stands in"
+  say "for it (the hub back on the screen by itself, the right way up, and taps landing under your finger)."
 }
 
 # --- finish -------------------------------------------------------------------------------
@@ -1468,7 +1479,12 @@ finish() {
   say "  The household lives in its Docker volume. Never run docker compose down -v or docker volume rm."
   case "$KIOSK_RESULT" in
     on) say "- Screen: the kiosk is set up ($SCREEN). Undo: $GUIDE#undo-the-kiosk" ;;
-    attention) say "- Screen: the kiosk is set up but needs a check after the restart: ./scripts/sproutwall setup kiosk --check. Undo: $GUIDE#undo-the-kiosk" ;;
+    attention)
+      say "- Screen: the kiosk is set up but needs a check after the restart: ./scripts/sproutwall setup kiosk --check. Undo: $GUIDE#undo-the-kiosk"
+      if [ "$OVER_SSH" = 1 ]; then
+        say "  With no keyboard and SSH off, the screen check after the restart stands in for it."
+      fi
+      ;;
     *) say "- Screen: no kiosk. To show the hub full screen, set it up by hand: $PI_GUIDE#step-6-show-the-hub-full-screen-on-the-pis-own-screen-optional" ;;
   esac
   local url="http://$address:3847" phone=""
@@ -1485,7 +1501,19 @@ finish() {
           say "- This device has no home Wi-Fi or router address, only the cable to your laptop, so no phone can"
           say "  reach it yet. Connect it to your home network for the phone check below. Then run"
           say "  ip -o -4 addr show scope global and use the address on the Wi-Fi or cable line (often wlan0 or eth0),"
-          say "  never one on a docker0, br- or veth line."
+          say "  never one on a docker0, br- or veth line, and never one that starts with 169.254. (the cable to your laptop)."
+        fi
+        ;;
+      10.42.0.* | 192.168.137.*)
+        # A laptop sharing its internet over a cable (NetworkManager shared,
+        # Windows internet sharing): a phone on the Wi-Fi reaches the
+        # device's other home address, when it has one.
+        if phone=$(phone_ipv4 "$LAPTOP_IPV4"); then
+          url="http://$phone:3847"
+        else
+          say "- This device's only address is on the cable your laptop shares its internet over. A phone on"
+          say "  your Wi-Fi may not reach it: if the phone check below can't open the page, connect this device"
+          say "  to your home Wi-Fi or router and use its address there (ip -o -4 addr show scope global)."
         fi
         ;;
     esac

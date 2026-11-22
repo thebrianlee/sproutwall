@@ -172,6 +172,37 @@ class PhoneCheckOnACableTests(base.InstallShTestCase):
         self.assertEqual(run.code, 0, run.out + run.err)
         self.assertNotIn("http://172.17.0.1:3847", run.out)
         self.assertIn("no phone can", run.out)
+        self.assertIn("never one that starts with 169.254. (the cable to your laptop)", run.out)
+
+    def test_laptop_sharing_its_internet_gives_the_phone_the_wifi_address(self):
+        # The laptop shares its internet over a cable (NetworkManager shared, 10.42.0.x);
+        # the device is also on the home Wi-Fi, where the phone is.
+        self.assert_shared_cable_phone_url("10.42.0.1", "10.42.0.23")
+
+    def test_windows_internet_sharing_gives_the_phone_the_wifi_address(self):
+        self.assert_shared_cable_phone_url("192.168.137.1", "192.168.137.23")
+
+    def assert_shared_cable_phone_url(self, laptop, device):
+        run = self.run_install(
+            base.SSH_ANSWERS,
+            SSH_CONNECTION="%s 52344 %s 22" % (laptop, device),
+            FAKE_HOSTNAME="%s 192.168.1.20" % device,
+            FAKE_IP4="3: eth0    inet %s/24 brd 10.42.0.255 scope global dynamic eth0\\       valid_lft forever preferred_lft forever\n2: wlan0    inet 192.168.1.20/24 brd 192.168.1.255 scope global dynamic wlan0\\       valid_lft 86000sec preferred_lft 86000sec" % device,
+        )
+        self.assertEqual(run.code, 0, run.out + run.err)
+        self.assertIn("on this computer (the one you are typing on) go to http://%s:3847" % device, run.out)
+        self.assertIn("on a phone on the same Wi-Fi, open http://192.168.1.20:3847", run.out)
+
+    def test_laptop_sharing_its_internet_with_no_other_address_keeps_the_laptop_url(self):
+        run = self.run_install(
+            base.SSH_ANSWERS,
+            SSH_CONNECTION="10.42.0.1 52344 10.42.0.23 22",
+            FAKE_HOSTNAME="10.42.0.23",
+            FAKE_IP4="3: eth0    inet 10.42.0.23/24 brd 10.42.0.255 scope global dynamic eth0\\       valid_lft forever preferred_lft forever",
+        )
+        self.assertEqual(run.code, 0, run.out + run.err)
+        self.assertIn("on a phone on the same Wi-Fi, open http://10.42.0.23:3847", run.out)
+        self.assertIn("only address is on the cable your laptop shares its internet over", run.out)
 
 
 class LinkLocalWithoutSshTests(base.InstallShTestCase):
