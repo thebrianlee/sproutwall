@@ -158,7 +158,7 @@ printf 'hostname %s\n' "$*" >>"$FAKE_LOG"
 [ "$1" = -I ] || exit 99
 count=$(( $(cat "$FAKE_STATE/hostname.count" 2>/dev/null || echo 0) + 1 ))
 echo "$count" >"$FAKE_STATE/hostname.count"
-if [ "$count" -gt 1 ] && [ -n "${FAKE_HOSTNAME_LATER:-}" ]; then
+if [ "$count" -ge "${FAKE_HOSTNAME_LATER_FROM:-2}" ] && [ -n "${FAKE_HOSTNAME_LATER:-}" ]; then
   echo "$FAKE_HOSTNAME_LATER"
 else
   echo "${FAKE_HOSTNAME:-192.168.1.50 172.17.0.1 fd12:3456::50}"
@@ -363,6 +363,10 @@ if [ "$1" = doctor ]; then
   exit 2
 fi
 if [ "$1 $2" = "setup kiosk" ] && [ "${3:-}" = --check ]; then
+  if [ -n "${FAKE_KIOSK_CHECK_EXIT:-}" ] && [ "$FAKE_KIOSK_CHECK_EXIT" != 0 ]; then
+    echo "Result: attention (exit $FAKE_KIOSK_CHECK_EXIT)"
+    exit "$FAKE_KIOSK_CHECK_EXIT"
+  fi
   echo "Result: ok (exit 0)"
   exit 0
 fi
@@ -893,6 +897,12 @@ class HappyPathTests(InstallShTestCase):
         self.assertIn("reconnect the one screen", run.out)
         self.assertNotIn("sudo raspi-config nonint do_boot_behaviour B4", run.log)
         self.assertIn("--kiosk off", run.out)
+
+    def test_kiosk_check_on_the_device_has_no_ssh_hint(self):
+        run = self.run_install(["", "y", "y", "", "", "y"], FAKE_KIOSK_CHECK_EXIT="1")
+        self.assertEqual(run.code, 0, run.out + run.err)
+        self.assertIn("The screen check needs attention", run.out)
+        self.assertNotIn("With no keyboard and SSH off", run.out)
 
     def test_declined_autologin_is_not_run(self):
         run = self.run_install(["", "y", "y", "", "", "n"])
@@ -1674,6 +1684,25 @@ class OverSshTests(InstallShTestCase):
         run = self.run_install(SSH_ANSWERS, FAKE_HOSTNAME_LATER="203.0.113.50 192.168.1.50", **SSH_ENV)
         self.assertEqual(run.code, 1, run.out + run.err)
         self.assertEqual(run.err.count("Stopped:"), 1)
+
+    def test_public_address_at_the_doctor_check_does_not_say_to_run_the_command_again(self):
+        # A public IPv4 address appears after the hub started (third hostname -I call).
+        self.doctor("running", ssh_policy=("fail", "review_ssh"), **TRUSTED_LAN)
+        run = self.run_install(
+            SSH_ANSWERS, FAKE_HOSTNAME_LATER="203.0.113.50 192.168.1.50", FAKE_HOSTNAME_LATER_FROM="3", **SSH_ENV
+        )
+        self.assertEqual(run.code, 1, run.out + run.err)
+        self.assertEqual(run.err.count("Stopped:"), 1)
+        self.assertIn("doctor found SSH in a state this install can't accept", run.err)
+        self.assertIn("don't run the one command again", run.err)
+        self.assertNotIn("run the command in the device's own Terminal", run.err)
+
+    def test_kiosk_check_over_ssh_names_the_no_keyboard_stand_in(self):
+        run = self.run_install(SSH_ANSWERS, FAKE_KIOSK_CHECK_EXIT="1", **SSH_ENV)
+        self.assertEqual(run.code, 0, run.out + run.err)
+        self.assertIn("The screen check needs attention", run.out)
+        self.assertIn("With no keyboard and SSH off you can't run that check", run.out)
+        self.assertIn("With no keyboard and SSH off, the screen check after the restart stands in for it.", run.out)
 
     def test_ipv6_only_lan_stops_in_preflight_over_ssh(self):
         # The session came over IPv6 and its interface has no IPv4 address.
