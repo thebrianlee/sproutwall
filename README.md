@@ -402,7 +402,7 @@ node scripts/check-pii.mjs
 
 Other scripts: `npm run bridge` starts only the bridge, and `npm run reset-pin -- <PIN>` resets the PIN in `data/`.
 
-**Next.js 16.** This is not the Next.js in older tutorials. APIs and file conventions changed. For example, request middleware is now `src/proxy.ts` (the `middleware` file convention was renamed to `proxy`). Read the guide for what you are changing in `node_modules/next/dist/docs/` first. See [AGENTS.md](AGENTS.md).
+**Next.js 16.** This is not the Next.js in older tutorials. APIs and file conventions changed. For example, request middleware is now `src/proxy.ts` (the `middleware` file convention was renamed to `proxy`). Read the guide for what you are changing in `node_modules/next/dist/docs/` first.
 
 ### Project layout
 

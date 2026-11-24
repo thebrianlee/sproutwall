@@ -21,7 +21,7 @@ Open <http://127.0.0.1:3847>. The first page asks you to name the household and 
 - `.env.example` sets `REQUIRE_AUTH_FOR_READS=0`, so screens are not locked while you develop. Set it to `1` to work on the unlock flow.
 - To start over, stop the dev server and delete `data/`.
 
-**Next.js 16.** APIs and file conventions differ from older Next.js versions. For example, request middleware lives in `src/proxy.ts`. Before you change framework code, read the matching guide in `node_modules/next/dist/docs/`. See [AGENTS.md](AGENTS.md).
+**Next.js 16.** APIs and file conventions differ from older Next.js versions. For example, request middleware lives in `src/proxy.ts`. Before you change framework code, read the matching guide in `node_modules/next/dist/docs/`.
 
 ## Tests
 
