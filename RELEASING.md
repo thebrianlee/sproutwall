@@ -21,7 +21,7 @@ The notes also give the `verify-image` command for that pair.
 ## Making a preview release
 
 1. Pick a run of the **Preview image** workflow on `main`. Copy its source commit and image index digest from the run's Summary page.
-2. Run the maintainer checks in [docs/install-cli.md](docs/install-cli.md) against that pair, including `scripts/sproutwall verify-image`.
+2. Check that pair with `scripts/sproutwall verify-image` ([docs/install-cli.md](docs/install-cli.md#verify-image-check-the-image-before-starting-it)).
 3. If the version in `package.json` at that commit has already been released, bump it in a pull request first, wait for the new image, and start again from step 1.
 4. Pin the pair in the install guide and in `install.sh` (its two `PINNED_` values at the top), together in one pull request. The maintainer note at the top of INSTALL-WITH-AI.md says how. `scripts/tests/test_install_sh.py` fails if the two disagree.
 5. Create a draft pre-release: tag `v<version>`, the source commit as its target, marked as a pre-release. Write the notes as described above.
