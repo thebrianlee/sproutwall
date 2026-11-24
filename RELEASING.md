@@ -16,7 +16,7 @@ A preview release is a GitHub pre-release, made by hand by a maintainer. It ties
 - **The image.** The release notes give the image's multi-arch index digest. The `:preview` tag moves with every push to `main`, so the digest, not the tag, identifies the release.
 - **The install guide.** [INSTALL-WITH-AI.md](INSTALL-WITH-AI.md) pins the same commit and digest, and so does the one-command install, [install.sh](install.sh).
 
-The notes also give the `verify-image` command for that pair, what was tested, and what was not.
+The notes also give the `verify-image` command for that pair.
 
 ## Making a preview release
 

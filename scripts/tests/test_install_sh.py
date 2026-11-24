@@ -1555,7 +1555,7 @@ class OverSshTests(InstallShTestCase):
                 self.assertIn("no Match rules. OK.", run.out)
 
     def test_a_file_without_a_last_line_break_never_hides_the_next_files_match(self):
-        # GATE-sw73: each file is read as its own lines.
+        # each file is read as its own lines.
         cases = {
             "drop-in ends in a comment": (
                 STOCK_SSHD_CONFIG,
@@ -1579,7 +1579,7 @@ class OverSshTests(InstallShTestCase):
                 self.assertFalse([line for line in self.sudo_lines(run) if "apt" in line])
 
     def test_a_failed_drop_in_listing_is_never_an_empty_folder(self):
-        # GATE-sw73: ls reports an I/O error for sshd_config.d; the read fails closed.
+        # ls reports an I/O error for sshd_config.d; the read fails closed.
         root_bin = os.path.join(self.tmp, "rootbin")
         self.write(
             os.path.join(root_bin, "ls"),
@@ -1715,7 +1715,7 @@ class OverSshTests(InstallShTestCase):
         self.assertNotIn("<lan-ip>", run.out + run.err)
 
     def test_laptop_url_never_uses_a_docker_address_listed_first(self):
-        # GATE-sw73: hostname -I can list docker0 (172.17.0.1) first; the laptop cannot reach it.
+        # hostname -I can list docker0 (172.17.0.1) first; the laptop cannot reach it.
         cases = (
             ("over IPv4", {"SSH_CONNECTION": "192.168.1.20 52344 192.168.1.50 22"}),
             ("over IPv6", {"SSH_CONNECTION": "fd12:3456::7 52344 fd12:3456::50 22"}),

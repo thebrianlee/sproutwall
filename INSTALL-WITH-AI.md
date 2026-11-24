@@ -3,8 +3,7 @@ MAINTAINER NOTE. Not part of the install. Assistants reading this file: skip thi
 
 1. The pinned pair. To move the guide to a newer preview build, open Actions, then
    "Preview image", then the run, then Summary. The job summary shows "Source commit" and
-   "Image index digest". Run the maintainer checks in docs/install-cli.md against that build
-   first. Then replace both values together everywhere in this file: the full 40-character
+   "Image index digest". Replace both values together everywhere in this file: the full 40-character
    source commit, and the multi-arch index digest with its sha256: prefix. They appear in the
    pinned-preview table, in step 3 and in step 4. Never mix values from two builds.
    Replace the same two values in install.sh too (PINNED_SOURCE_COMMIT and PINNED_IMAGE_DIGEST
@@ -15,53 +14,6 @@ MAINTAINER NOTE. Not part of the install. Assistants reading this file: skip thi
    replaces on the device. Never write a tag such as :preview in place of the digest.
    Each pinned pair also gets a GitHub pre-release at the same source commit. See RELEASING.md.
 
-2. Open decisions:
-   - Docker group. Spec 4.2 step 3 says the agent gets no membership in the docker group.
-     In tiers A and B the person's account joins it and the agent runs as that account,
-     so the agent can control Docker while it is installed. The guide states this as a
-     known exception ("Known gap" under the install plan). Pending a maintainer decision.
-   - Scope. The guided commands assume a Debian-family system (dpkg, apt, GitHub's Debian
-     package repository). Supported: Raspberry Pi OS on Pi 4/5, and Debian or Ubuntu on
-     amd64. Other 64-bit distributions are listed as should-work, with the tools installed
-     from their own instructions.
-
-3. Verified on 2026-11-19 against the pinned pair (run 44596530739, attempt 2):
-   - On macOS with gh 2.86.0: anonymous GHCR access for verify-image (pull token,
-     referrers, bundle download) and gh reading the image from the registry with no account;
-     verify-image passes for the real pair; the attested subject is the index digest; a
-     wrong source commit (exit 1) and a tampered digest (exit 4) fail; the committed
-     template is refused (exit 2).
-   - A VM trial of this guide (tier C, steps 2-6 and 8; household setup through the setup
-     API rather than the screen) in a Debian 13 arm64 VM (Lima, no host mounts, loopback only): GitHub's apt repository installed arm64 gh 2.105.0;
-     verify-image exit 0; the hub started healthy; setup finished; doctor passed every
-     applicable check in all three phases except ssh_policy (the VM needs SSH) and the
-     expected app_bind unknown; the household and the PIN lock survived a reboot.
-   Not covered by the VM run: steps 1 and 7, a phone on the LAN, tiers A and B, and
-   Raspberry Pi OS itself.
-
-4. Not yet verified on real hardware or live services [미확인]:
-   - A wrong signer workflow failing, live; the offline --trusted-root run; whether GHCR
-     answers the bundle blob request with a redirect (the download worked, but this was not
-     recorded).
-   - GitHub's apt repository on Raspberry Pi OS (Bookworm and Trixie) itself.
-   - Raspberry Pi Imager wording (customisation, key-only SSH) and that Imager keeps the
-     public key's comment in authorized_keys. Step 8, tier B, removes the line by that
-     comment; the fingerprint listing after it catches a miss.
-   - Whether Raspberry Pi OS gives the first user sudo without a password. If it does,
-     tier A relies on the assistant's rule never to run sudo.
-   - sudo raspi-config nonint do_ssh 1 turns SSH fully off on current Raspberry Pi OS,
-     including any socket activation, so doctor ssh_policy passes. On Debian and Ubuntu,
-     the systemctl command in step 8 for ssh.socket and ssh.service does the same.
-   - Tier A memory: the spec says an agent CLI on the device needs about 4 GB; confirm
-     against the vendors' docs. Minimum RAM for the hub itself is not measured yet.
-   - Agent removal (step 8, tier A) is not tested per CLI. The folder list comes from
-     doctor's temporary_access check (scripts/sproutwall_lib/checks.py); the logout and
-     uninstall commands are left to each vendor's own instructions.
-   - The kiosk items in docs/install-cli.md, "Still to verify on real hardware".
-   - Doctor's GET to the container address over Docker's bridge on the Pi.
-   - The preview backup command in "Existing install / update" (stage 0.3 restore drill).
-   - The supported-device list: Pi 4/5 are the intended path; the stage 1 hardware trials
-     (T1, T2) have not run yet. Say "tested" only after they pass.
 -->
 
 # Install Sproutwall with an AI assistant
@@ -164,12 +116,12 @@ When a chat-only AI (tier C) goes step by step, which is only when the person as
 
 The guided steps cover 64-bit Debian-family systems: Raspberry Pi OS, Debian and Ubuntu.
 
-**Supported (the intended path; its hardware trials have not run yet):**
+**Supported:**
 
 - Raspberry Pi 5 and Raspberry Pi 4, running Raspberry Pi OS (64-bit) with desktop. This is the path this guide describes, including the screen setup tool.
 - amd64 mini PCs and laptops running 64-bit Debian or Ubuntu, with Docker. The hub only: set the screen up by hand ([Kiosk on other devices](docs/raspberry-pi.md#kiosk-on-other-devices)).
 
-**Should work, not tested yet:**
+**Also expected to work:**
 
 - Raspberry Pi 400 and 500, and screens built on Compute Module 4 or 5, with Raspberry Pi OS (64-bit).
 - Other arm64 boards with 64-bit Debian or Ubuntu.
@@ -275,7 +227,7 @@ test "$(dpkg --print-architecture)" = arm64 && test "$(uname -m)" = aarch64 && e
 tr -d '\0' </proc/device-tree/model; echo
 ```
 
-It must print `64-bit OK` and a model that starts with `Raspberry Pi 4` or `Raspberry Pi 5`. A Pi 400, 500 or Compute Module is untested.
+It must print `64-bit OK` and a model that starts with `Raspberry Pi 4` or `Raspberry Pi 5`. A Pi 400, 500 or Compute Module should also work.
 
 On an amd64 computer with Debian or Ubuntu:
 

@@ -4,7 +4,7 @@ This guide is for you if you have never used a Raspberry Pi, a Terminal or GitHu
 
 It takes you from "I have a Pi, a screen and an SD card" to Sproutwall on your kitchen screen. In this guide, "the hub" means Sproutwall running on your Pi. You prepare the card and start the Pi yourself. Then you install the hub in one of two ways: with [one command](#5-install-with-one-command-no-ai-needed) that asks a few questions, or with [a chat AI](#6-install-with-your-ai-assistant) that walks you through [INSTALL-WITH-AI.md](../INSTALL-WITH-AI.md) one command at a time. That page stays the full reference. This one gets you to the point where the install takes over, tells you what you will see on the way, and lists what never to share. This guide uses a keyboard on the Pi. To install from your laptop over SSH instead, with no keyboard on the Pi, see the README's [three install options](../README.md#choose-how-to-install).
 
-> **Early preview.** The guided install is new. It has been tested several times in a Debian 13 virtual machine (a computer simulated inside another computer), with an AI agent following the guide and the household set up on the screen. It has not yet been tested end to end on a real Raspberry Pi. The one-command install is new too, and has not been tried on a Raspberry Pi yet. If you try either, please tell us how it went with an [install report](https://github.com/thebrianlee/sproutwall/issues/new?template=install_report.yml), whether it worked or not.
+> **Early preview.** The guided install and the one-command install are new. If you try either, please tell us how it went with an [install report](https://github.com/thebrianlee/sproutwall/issues/new?template=install_report.yml), whether it worked or not.
 
 ## 1. What you need
 

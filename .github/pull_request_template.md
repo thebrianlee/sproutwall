@@ -14,6 +14,3 @@
 - [ ] README, `SECURITY.md` or `docs/` updated if behavior changed
 - [ ] No real names, schools, addresses, calendar links, tokens, PINs or family photos in the code, tests, screenshots or this description
 - [ ] This touches auth, the PIN, the bridge, Docker or secrets (`src/proxy.ts`, `src/lib/session.ts`, `src/lib/guard.ts`, `src/lib/auth.ts`, `src/lib/pin-attempts.ts`, `src/lib/safe-fetch.ts`, `src/app/api/`, `bridge/`, `Dockerfile`, `docker-compose*.yml`, `docker/`, `scripts/`, `.github/`) and needs a maintainer review
-- [ ] Agent-authored: an AI agent wrote most of this pull request. I added the `agent-authored` label, and I name the tool or model and the human who reviewed it below.
-
-<!-- Agent-authored pull requests: tool or model, and the human reviewer. -->

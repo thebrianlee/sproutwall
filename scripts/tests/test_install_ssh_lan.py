@@ -1,4 +1,4 @@
-"""install.sh over SSH: which IPv4 address the laptop is given (GATE-sw74).
+"""install.sh over SSH: which IPv4 address the laptop is given.
 
 The session's own interface decides it, never the default route (a second
 uplink such as a USB tether can carry that), and link-local 169.254/16 counts

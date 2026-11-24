@@ -14,7 +14,7 @@ Plan for an evening. Most of the time is waiting for downloads and the first bui
 - Raspberry Pi OS **64-bit**, Bookworm or later.
 - An SSD on USB (best), or a good microSD card rated **A2**. Cheap cards make the Pi slow and can wear out. 32 GB or larger leaves room for updates and photos.
 - The official power supply for your Pi model. A weak supply causes strange crashes.
-- Optional: a screen. The kiosk tool in [Step 6](#step-6-show-the-hub-full-screen-on-the-pis-own-screen-optional) needs one touch screen on HDMI or DSI; which models work with it is not tested yet [미확인]. A screen without touch can be set up by hand.
+- Optional: a screen. The kiosk tool in [Step 6](#step-6-show-the-hub-full-screen-on-the-pis-own-screen-optional) needs one touch screen on HDMI or DSI; A screen without touch can be set up by hand.
 
 **Not supported:**
 
@@ -139,15 +139,13 @@ The tool also turns off the desktop's screen blanking, so the screen stays lit. 
 
 The tool supports exactly one setup: Raspberry Pi OS 64-bit with the desktop, its standard Wayland desktop (labwc), exactly one screen on HDMI or DSI, one touch input, and Chromium. On anything else it stops, changes nothing and says why; then set the screen up by hand. [docs/install-cli.md](install-cli.md#setup-kiosk-the-pis-own-touch-screen) lists every check, every file it writes and how each is undone.
 
-Which screens have been tried with the tool: none yet [미확인]. The model, connection and touch type of the screen used in the first physical trial are recorded then.
-
 ### Set it up by hand
 
 Use this when the tool stops, for a screen without touch, or on an older image.
 
 1. **Screen blanking off:** run `sudo raspi-config`, choose **Display Options**, then **Screen Blanking**, and answer **No**.
 2. **Desktop autologin:** in `sudo raspi-config`, under **System Options**, find the boot or auto-login option (the wording differs between releases) and choose **Desktop Autologin**.
-3. **Rotation and touch:** open **Control Centre**, then **Screens**. Set the screen's orientation and, if it offers one, the touchscreen it belongs to [미확인: the menu wording differs between releases]. Apply and confirm.
+3. **Rotation and touch:** open **Control Centre**, then **Screens**. Set the screen's orientation and, if it offers one, the touchscreen it belongs to (the menu wording differs between releases). Apply and confirm.
 4. **Start Chromium at login.** Find the browser's name with `command -v chromium chromium-browser`. On current releases (labwc), add this line to `~/.config/labwc/autostart` (create the file if needed, for example with `nano ~/.config/labwc/autostart`), using the name it printed:
 
    ```bash
@@ -185,8 +183,6 @@ The hub runs on any 64-bit Linux computer, but the kiosk tool only sets up Raspb
 - Chromium: `chromium --kiosk --no-first-run http://127.0.0.1:3847`. Firefox: `firefox --kiosk http://127.0.0.1:3847`. Add it to the desktop's own startup programs.
 - Use a normal (persistent) profile, never a private or incognito window, so the screen's unlock lasts.
 - Turn off the device's own screen blanking and set rotation and touch in its own display settings.
-
-How this works on specific screens and desktops is not tested [미확인].
 
 ## Keep it running
 

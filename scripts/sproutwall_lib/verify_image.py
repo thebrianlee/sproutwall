@@ -3,7 +3,7 @@
 It takes the digest Compose would start from docker-compose.preview.yml (the
 literal pin, equal to the effective `docker compose config`; never a tag),
 checks that gh is new enough, gets the attestation bundle anonymously from GHCR (or
-from --bundle), and runs the spec 4.2 step 4 command with `--bundle`, the only
+from --bundle), and runs the verifier command with `--bundle`, the only
 gh mode that needs no `gh auth login`. gh runs with a fresh, empty config
 folder and no token variables, so the result never depends on a login.
 
@@ -98,7 +98,7 @@ MESSAGES = {
 
 
 def gh_verify_argv(digest, source_sha, bundle_path, trusted_root=None):
-    """The exact verifier command (spec 4.2 step 4, account-free form).
+    """The exact verifier command (account-free form).
 
     The one place that builds it. digest: "sha256:<64 hex>" from the compose
     pin (the prefix is required). source_sha: the published 40-hex commit.
