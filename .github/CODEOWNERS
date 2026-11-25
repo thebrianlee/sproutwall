@@ -1,5 +1,4 @@
-# Code owners for Sproutwall. See GOVERNANCE.md and
-# docs/maintainers/repo-setup.md, section 5.
+# Code owners for Sproutwall. See GOVERNANCE.md.
 #
 # GitHub asks this owner for a review automatically. The ruleset for main
 # does not require an approval; @hjunk reviews pull requests from

@@ -472,7 +472,7 @@ class SshPolicyTests(unittest.TestCase):
             self.assertEqual(run("ssh_policy", s, tier="B"), PASS, extra)  # tier B allows passwords
 
     def test_unreadable_config_is_unknown_while_ssh_is_on(self):
-        # GATE-sw73: SSH that is off passes even when the config cannot be read
+        # SSH that is off passes even when the config cannot be read
         # (Raspberry Pi Imager can leave a root-only file in sshd_config.d).
         # While SSH is on, an unreadable config is never ignored.
         setups = (
@@ -923,7 +923,7 @@ class TemporaryAccessTests(unittest.TestCase):
         self.assertEqual(run("temporary_access", s, phase="final"), ("unknown", "retry_local"))
 
     def test_root_only_imager_file_with_ssh_off_passes(self):
-        # GATE-sw74: the final check after the person turned SSH off and
+        # the final check after the person turned SSH off and
         # restarted, with Raspberry Pi Imager's root-only file in sshd_config.d.
         unreadable = (
             lambda s: s.files.__setitem__("/etc/ssh/sshd_config.d/50-cloud-init.conf", PermissionError(13, "denied")),

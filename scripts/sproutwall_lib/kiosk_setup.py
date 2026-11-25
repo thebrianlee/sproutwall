@@ -1,4 +1,4 @@
-"""`sproutwall setup kiosk`: one output, with touch mapped to it (spec 4.4).
+"""`sproutwall setup kiosk`: one output, with touch mapped to it.
 
   setup kiosk [--orientation portrait|portrait-flipped|landscape|landscape-flipped]
   setup kiosk --check [--json]

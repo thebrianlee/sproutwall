@@ -196,7 +196,7 @@ def residual_is_trusted_lan_only(report):
 
 
 def t1t2_may_continue(report, network_prerequisite_affirmed):
-    """Spec 4.3 T1/T2: continue on exit 2 only when all of these hold:
+    """Continue on exit 2 only when all of these hold:
 
     - the sole unknown is app_bind/confirm_trusted_lan;
     - local inspection completed without finding public exposure;

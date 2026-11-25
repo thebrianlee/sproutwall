@@ -1,4 +1,4 @@
-"""The closed schema, the result/exit rules and the T1/T2 exit-2 rule."""
+"""The closed schema, the result/exit rules and the exit-2 continue rule."""
 
 import io
 import json

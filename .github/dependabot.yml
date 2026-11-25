@@ -1,5 +1,4 @@
-# Dependabot version updates. GitHub starts using this file once it is on the
-# default branch. See docs/maintainers/repo-setup.md.
+# Dependabot version updates.
 version: 2
 updates:
   - package-ecosystem: npm

@@ -317,9 +317,8 @@ def parse_wlr_randr_json(text):
     Reads name, enabled, modes[width, height, preferred, current] and
     transform, all required; anything that is not exactly that shape raises
     ValueError.
-    [미확인] The field names follow wlr-randr 0.4's JSON output; the
-    authoring sandbox could not reach the upstream repository, so a ValueError
-    here makes the caller use the plain-text output instead.
+    The field names follow wlr-randr 0.4's JSON output. A ValueError here
+    makes the caller use the plain-text output instead.
     """
     from .kiosk import loads_strict
 

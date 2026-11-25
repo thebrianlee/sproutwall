@@ -1,4 +1,4 @@
-"""Spec 4.4 "Must for T1/T2" item 2: doctor redaction canaries.
+"""Doctor redaction canaries.
 
 Fictional names, an iCal URL with a query token, a PIN, an API key and a
 cookie are seeded into command stdout and stderr, file contents, exception
@@ -42,7 +42,7 @@ SCRIPTS = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SCRIPT = os.path.join(SCRIPTS, "sproutwall")
 REPO = os.path.dirname(SCRIPTS)
 
-# The closed schema of spec 4.3, written out here on purpose instead of
+# The closed schema, written out here on purpose instead of
 # imported from sproutwall_lib.schema, so a change there cannot also change
 # what this test expects.
 EXPECTED_KEYS = ["schema", "phase", "result", "checks"]

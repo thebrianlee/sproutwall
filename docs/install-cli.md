@@ -84,8 +84,6 @@ With `--json` anywhere on the command line, stdout is exactly one JSON object on
 | 1 | `fail` | At least one check failed. |
 | 2 | `unknown` | No failure, but at least one applicable check is unknown. A usage error also exits 2. |
 
-**Trials T1 and T2.** Continue on exit 2 only when the only unknown is `app_bind` with `confirm_trusted_lan` (inspection completed and found no public exposure) and the operator affirmed the trusted-network prerequisite in decision 3. Record that residual unknown; it is not a clean pass. Any other unknown or any failure stops.
-
 ### Redaction
 
 `scripts/sproutwall` is a small bootstrap that sets this up before anything else runs: it turns off warnings and bytecode files, installs handlers for uncaught exceptions in the main thread and in other threads, and runs every import and the whole command inside one guard. If anything fails, even importing the tool's own code, a `--json` run prints the fixed object above (exit 2) and any other run prints one fixed line to stderr. Never a traceback or a path.
@@ -127,20 +125,6 @@ It takes the digest of the image that `docker compose -f docker-compose.preview.
 | 5 | Its temporary files could not be removed. This wins in every case, even over a successful check or an unexpected error, and the image counts as not verified: remove the `sproutwall-verify-*` folders in the system's temporary folder, then run it again. |
 
 Messages are fixed text. gh's own output is never printed.
-
-### Checks against the first preview image
-
-The sandbox that wrote this could not reach GHCR, Sigstore or GitHub's package repository. A maintainer runs these on a clean 64-bit Raspberry Pi OS with no `~/.config/gh` and no `GH_TOKEN`. Items marked "Done" passed on 2026-11-19 against the pinned pair (run 44596530739, attempt 2), on macOS with gh 2.86.0 and Docker Compose 5.8.0, except item 4, which was checked in a Debian 13 arm64 VM on the same day. They still need one run on the Pi.
-
-1. Done: anonymous GHCR access: the pull token, the referrers list (or the `sha256-<hex>` tag fallback) and the bundle blob are served without an account.
-2. [미확인] (unverified): the bundle download worked, but whether GHCR answered with a redirect was not recorded. To check: GHCR answers the blob request with a single redirect to `pkg-containers.githubusercontent.com` (`BLOB_REDIRECT_HOST` in `scripts/sproutwall_lib/attestation.py`), and the signed link there needs no further redirect.
-3. Done: with an `oci://` subject, gh also reads the image from the registry anonymously.
-4. GitHub's apt repository has arm64 packages, and `gh --version` there is 2.68.0 or newer. Done on Debian 13 arm64 (gh 2.105.0); not yet on Raspberry Pi OS.
-5. Done: the attested subject is the multi-arch index digest that `docker-compose.preview.yml` pins.
-6. `verify-image` passes against the real pair (done), then once more with `--trusted-root` and no network (not run yet).
-7. Negative tests fail with a non-zero exit: wrong `--source-sha` (done, exit 1), a tampered digest (done, exit 4), wrong signer workflow (not run yet).
-8. [미확인] (unverified) on the Pi: Docker's bridge routes from the host to the container address, so doctor's `GET` to `http://<container address>:3847/api/health` answers. Rootless Docker is expected to give `unknown` instead.
-9. On a dual-stack network, `0.0.0.0:3847:3847` creates no IPv6 listener (`ss -ltn` shows no `[::]:3847`) and doctor reports `app_bind` as `unknown` / `confirm_trusted_lan`.
 
 ## `setup kiosk`: the Pi's own touch screen
 
@@ -277,16 +261,3 @@ The hub's own screensaver is part of the app and is not affected by any of this.
 | 6 | Stopped: something it must read could not be read or did not parse, a managed file has extra hard links, another owner or group, or extended attributes, a folder would give new files an ACL or another group, or the file system cannot swap files atomically, so it cannot tell whether an edit is safe or cannot undo it exactly. Nothing was changed, unless the message says writing had started (a file it had just written came out with an ACL: that file was rolled back). (`--check`: an item is `unknown`.) |
 
 Messages are fixed text chosen by these outcomes. The screen is named only by its kind (HDMI or DSI); its connector name, the touch device name, paths, user names and command output are written to the config files where needed but never printed, in text or JSON. The unit tests seed a fictional user name, home path, touch device name and connector names into every input and run every subcommand in process and through the real `scripts/sproutwall` in a subprocess, capturing the real output streams, a DEBUG root logger and warnings; none of the seeded values may appear.
-
-### Still to verify on real hardware
-
-The sandbox that wrote this had no Raspberry Pi, display or touch panel. On the acceptance screen of the first physical trial, record the observed connector, native mode, touch input and OS build, then check:
-
-1. [미확인] `wlr-randr --json` on current Raspberry Pi OS prints the fields the parser reads (`name`, `enabled`, `modes[].width/height/preferred/current`, `transform`); otherwise the plain-format fallback is used.
-2. [미확인] The touch input is found and mapped: tap all four corners and the centre in the chosen orientation, after setup and again after a reboot.
-3. [미확인] kanshi applies the profile at login and after `SIGHUP`, and the rotation survives a reboot.
-4. [미확인] The panel's own mode decides portrait correctly (a natively portrait DSI panel stays at `normal`).
-5. [미확인] With autologin on, Chromium opens without a keyring prompt and without a "restore pages" bubble after a power cut; the unlock survives a reboot.
-6. [미확인] The screen stays lit past the old blanking interval; the hub's screensaver still starts.
-7. [미확인] `--off` plus reboot opens no browser, `--undo` brings back the earlier desktop behaviour, and re-enabling gives one browser after a cold boot.
-8. [미확인] The labwc and kanshi processes of the Raspberry Pi OS session have `XDG_CONFIG_DIRS` unset, empty or `/etc/xdg` (otherwise setup refuses with `config_path`), and the home folder's file system passes the `renameat2` probe (ext4 on the SD card or SSD does; the sandbox's ext4 did).

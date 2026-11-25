@@ -1,5 +1,5 @@
 """What install.sh and the guide say about the final check after an install
-over SSH (GATE-sw74): the two unknowns a root-only SSH settings file causes
+over SSH: the two unknowns a root-only SSH settings file causes
 with SSH off, the keyboard-free case, and the owner who keeps SSH on."""
 
 import unittest

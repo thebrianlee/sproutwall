@@ -105,7 +105,7 @@ If you are an AI assistant helping someone install Sproutwall, follow these rule
 - **Don't use the build-from-source installs** ([manual install](docs/manual-install.md), and the build steps of the [Raspberry Pi guide](docs/raspberry-pi.md)) for a family. They are for developers: they build the image on the device instead of installing the verified one.
 - **Full rules:** [For the AI reading this](INSTALL-WITH-AI.md#for-the-ai-reading-this) in INSTALL-WITH-AI.md. They apply to every step.
 
-> **Early preview.** Sproutwall started as one family's kitchen screen and runs there every day, but the guided install is new. We have tested the tier C guided install several times in fresh Debian 13 arm64 VMs, most recently with household setup and the screen unlock done through the screen itself. We haven't tested the guided install on a Raspberry Pi yet. If you try it, please tell us how it went with an [install report](https://github.com/thebrianlee/sproutwall/issues/new?template=install_report.yml), whether it worked or not. Bugs are welcome as [issues](https://github.com/thebrianlee/sproutwall/issues/new/choose), and ideas and questions in [Discussions](https://github.com/thebrianlee/sproutwall/discussions).
+> **Early preview.** Sproutwall started as one family's kitchen screen and runs there every day; the guided install is new. If you try it, please tell us how it went with an [install report](https://github.com/thebrianlee/sproutwall/issues/new?template=install_report.yml), whether it worked or not. Bugs are welcome as [issues](https://github.com/thebrianlee/sproutwall/issues/new/choose), and ideas and questions in [Discussions](https://github.com/thebrianlee/sproutwall/discussions).
 
 It shows the day at a glance: weather, the family calendar, routines, meals, lists, a reading shelf, a points jar (Family Bucks), and Ask the Hub, a question wall for kids. The household's data stays on the computer that runs it.
 
@@ -402,7 +402,7 @@ node scripts/check-pii.mjs
 
 Other scripts: `npm run bridge` starts only the bridge, and `npm run reset-pin -- <PIN>` resets the PIN in `data/`.
 
-**Next.js 16.** This is not the Next.js in older tutorials. APIs and file conventions changed. For example, request middleware is now `src/proxy.ts` (the `middleware` file convention was renamed to `proxy`). Read the guide for what you are changing in `node_modules/next/dist/docs/` first. See [AGENTS.md](AGENTS.md).
+**Next.js 16.** This is not the Next.js in older tutorials. APIs and file conventions changed. For example, request middleware is now `src/proxy.ts` (the `middleware` file convention was renamed to `proxy`). Read the guide for what you are changing in `node_modules/next/dist/docs/` first.
 
 ### Project layout
 
